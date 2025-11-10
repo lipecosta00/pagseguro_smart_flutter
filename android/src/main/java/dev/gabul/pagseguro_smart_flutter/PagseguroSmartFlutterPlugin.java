@@ -2,7 +2,6 @@ package dev.gabul.pagseguro_smart_flutter;
 import android.app.Activity;
 import android.content.Context;
 import androidx.annotation.NonNull;
-import androidx.annotation.NonNull;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPag;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagAppIdentification;
 import dev.gabul.pagseguro_smart_flutter.core.PagSeguroSmart;
@@ -10,16 +9,10 @@ import dev.gabul.pagseguro_smart_flutter.payments.PaymentsFragment;
 import dev.gabul.pagseguro_smart_flutter.payments.PaymentsPresenter;
 import dev.gabul.pagseguro_smart_flutter.payments.PaymentsUseCase;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
-import io.flutter.embedding.engine.plugins.FlutterPlugin;
-import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public class PagseguroSmartFlutterPlugin
   implements FlutterPlugin, MethodCallHandler {
