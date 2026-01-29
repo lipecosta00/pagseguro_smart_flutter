@@ -200,6 +200,20 @@ class Payment {
     }
   }
 
+  /// Obtém os dados do sub-adquirente (CNPJ, nome, etc.)
+  /// Retorna null se não houver perfil de sub-adquirência configurado
+  Future<Map<String, dynamic>?> getSubAcquirerData() async {
+    try {
+      final result = await channel.invokeMethod(
+        PaymentTypeCall.GET_SUB_ACQUIRER_DATA.method,
+      );
+      if (result == null) return null;
+      return Map<String, dynamic>.from(result);
+    } catch (e) {
+      return null;
+    }
+  }
+
 //Function to listen to pagseguro returns in the native environment and notify Flutter
   Future<dynamic> _callHandler(MethodCall call) async {
     switch (call.method.handler) {

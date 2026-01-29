@@ -5,6 +5,9 @@ import android.util.Log;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPag;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagAppIdentification;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagCustomPrinterLayout;
+import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagSubAcquirerResult;
+import java.util.HashMap;
+import java.util.Map;
 import dev.gabul.pagseguro_smart_flutter.managers.UserDataManager;
 import dev.gabul.pagseguro_smart_flutter.nfc.NFCFragment;
 import dev.gabul.pagseguro_smart_flutter.nfc.NFCPresenter;
@@ -55,6 +58,9 @@ public class PagSeguroSmart {
   //Printer
   private static final String PRINTER_FILE = "paymentPrinterFile";
   private static final String PRINTER = "paymentPrinter";
+
+  //Sub Acquirer
+  private static final String GET_SUB_ACQUIRER_DATA = "getSubAcquirerData";
 
   private static final String PRINTER_BASIC = "paymentPrinterBasic";
   private static final String PRINTER_FILE_PATH = "paymentPrinterFilePath";
@@ -213,10 +219,38 @@ public class PagSeguroSmart {
     }
     else if(call.method.equals(DEBIT_NFC)) {
       this.nfcPayment.debitNFCCard(call.argument("idEvento"),call.argument("valor"));
+    } else if (call.method.equals(GET_SUB_ACQUIRER_DATA)) {
+      getSubAcquirerData(result);
     } else {
       result.notImplemented();
     }
   }
+  private void getSubAcquirerData(MethodChannel.Result result) {
+    try {
+      PlugPagSubAcquirerResult data = plugPag.getSubAcquirerData();
+      if (data != null) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("cnpjCpf", data.getCnpjCpf());
+        map.put("docType", data.getDocType());
+        map.put("merchantId", data.getMerchantId());
+        map.put("fullName", data.getFullName());
+        map.put("name", data.getName());
+        map.put("address", data.getAddress());
+        map.put("city", data.getCity());
+        map.put("uf", data.getUf());
+        map.put("zipCode", data.getZipCode());
+        map.put("country", data.getCountry());
+        map.put("telephone", data.getTelephone());
+        map.put("mcc", data.getMcc());
+        result.success(map);
+      } else {
+        result.success(null);
+      }
+    } catch (Exception e) {
+      result.error("SUB_ACQUIRER_ERROR", e.getMessage(), null);
+    }
+  }
+
   public void dispose() {
     if (this.payment != null) {
       this.payment.dispose();
