@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
@@ -17,7 +18,8 @@ class _PaymentPageState extends State<PaymentPage> {
   final PaymentController controller = PaymentController();
 
   double? saleValue;
-  MoneyMaskedTextController moneyController = MoneyMaskedTextController(leftSymbol: "R\$ ", decimalSeparator: ",");
+  MoneyMaskedTextController moneyController =
+      MoneyMaskedTextController(leftSymbol: "R\$ ", decimalSeparator: ",");
 
   @override
   void initState() {
@@ -53,6 +55,16 @@ class _PaymentPageState extends State<PaymentPage> {
           const SizedBox(
             height: 20,
           ),
+
+          // Acquired Data
+          FutureBuilder(
+            future: _getCNPJ(),
+            builder: (context, snap) =>
+                snap.connectionState == ConnectionState.done
+                    ? Text((snap.data! as String))
+                    : const CircularProgressIndicator(),
+          ),
+          
           Wrap(
             spacing: 10.0,
             children: <Widget>[
@@ -65,7 +77,9 @@ class _PaymentPageState extends State<PaymentPage> {
                           controller.clickPayment = true;
                         });
                         //Chamar o método de pagamento para transação no débito
-                        PagseguroSmart.instance().payment.debitPayment(controller.saleValue);
+                        PagseguroSmart.instance()
+                            .payment
+                            .debitPayment(controller.saleValue);
                       }
                     : null,
               ),
@@ -78,7 +92,9 @@ class _PaymentPageState extends State<PaymentPage> {
                           controller.clickPayment = true;
                         });
                         //Chamar o método de pagamento para transação no crédito a vista
-                        PagseguroSmart.instance().payment.creditPayment(controller.saleValue);
+                        PagseguroSmart.instance()
+                            .payment
+                            .creditPayment(controller.saleValue);
                       }
                     : null,
               ),
@@ -91,7 +107,9 @@ class _PaymentPageState extends State<PaymentPage> {
                           controller.clickPayment = true;
                         });
                         //Chamar o método de pagamento para transação no crédito parcelado em 2x
-                        PagseguroSmart.instance().payment.creditPaymentParc(controller.saleValue, 2);
+                        PagseguroSmart.instance()
+                            .payment
+                            .creditPaymentParc(controller.saleValue, 2);
                       }
                     : null,
               ),
@@ -104,7 +122,9 @@ class _PaymentPageState extends State<PaymentPage> {
                           controller.clickPayment = true;
                         });
                         //Chamar o método de pagamento para transação no voucher
-                        PagseguroSmart.instance().payment.voucherPayment(controller.saleValue);
+                        PagseguroSmart.instance()
+                            .payment
+                            .voucherPayment(controller.saleValue);
                       }
                     : null,
               ),
@@ -117,7 +137,9 @@ class _PaymentPageState extends State<PaymentPage> {
                           controller.clickPayment = true;
                         });
                         //Chamar o método de pagamento para transação no pix
-                        PagseguroSmart.instance().payment.pixPayment(controller.saleValue);
+                        PagseguroSmart.instance()
+                            .payment
+                            .pixPayment(controller.saleValue);
                       }
                     : null,
               ),
@@ -152,7 +174,8 @@ class _PaymentPageState extends State<PaymentPage> {
           ),
           ElevatedButton(
             onPressed: () {
-              Future.delayed(const Duration(seconds: 3)).then((value) => setState(() {}));
+              Future.delayed(const Duration(seconds: 3))
+                  .then((value) => setState(() {}));
               //Chamar o método para retornar a última transação realizada
               PagseguroSmart.instance().payment.lastTransaction();
             },
@@ -206,12 +229,34 @@ class _PaymentPageState extends State<PaymentPage> {
             ElevatedButton(
               onPressed: () {
                 //Chamar o método para estornar uma transação
-                PagseguroSmart.instance().payment.refund(transactionCode: controller.transactionCode, transactionId: controller.transactionId);
+                PagseguroSmart.instance().payment.refund(
+                    transactionCode: controller.transactionCode,
+                    transactionId: controller.transactionId);
               },
               child: const Text("Estornar transação"),
             ),
         ],
       ),
     );
+  }
+
+  Future<String> _getCNPJ() async {
+    try {
+      final isAuth = await PagseguroSmart.instance().payment.isAuthenticated();
+      if (isAuth) {
+        await PagseguroSmart.instance().payment.activePinpad('749879');
+
+        final data =
+            await PagseguroSmart.instance().payment.getSubAcquirerData();
+        if (data != null) {
+          return data['cnpjCpf'];
+        } else {
+          return 'Error to get Acquirer Data';
+        }
+      }
+    } catch (e) {
+      return 'Exception';
+    }
+    throw Exception('Erro');
   }
 }
