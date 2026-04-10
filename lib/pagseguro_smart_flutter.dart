@@ -2,11 +2,16 @@ import 'package:flutter/services.dart';
 
 import 'package:pagseguro_smart_flutter/payments/handler/nfc_handler.dart';
 import 'package:pagseguro_smart_flutter/payments/nfc.dart';
+import 'package:pagseguro_smart_flutter/payments/user_data.dart';
 
 import 'payments/handler/payment_handler.dart';
 import 'payments/payment.dart';
 
 export 'package:pagseguro_smart_flutter/payments/print_render_widget.dart';
+export 'package:pagseguro_smart_flutter/payments/sub_acquirer_data.dart';
+export 'package:pagseguro_smart_flutter/payments/user_data.dart';
+
+const CHANNEL_NAME = "pagseguro_smart_flutter";
 
 class PagseguroSmart {
   final MethodChannel _channel;
@@ -48,5 +53,15 @@ class PagseguroSmart {
       throw "NFC NEED INITIALIZE! \n TRY: PagseguroSmart._instance.initNfc(handler)";
     }
     return _nfc!;
+  }
+
+  Future<UserData?> getUserData() async {
+    try {
+      final result = await _channel.invokeMethod('getUserData');
+      if (result == null) return null;
+      return UserData.fromMap(Map<String, dynamic>.from(result));
+    } catch (e) {
+      throw "Error getting user data: $e";
+    }
   }
 }

@@ -249,7 +249,7 @@ class _PaymentPageState extends State<PaymentPage> {
         final data =
             await PagseguroSmart.instance().payment.getSubAcquirerData();
         if (data != null) {
-          return data['cnpjCpf'];
+          return data.cnpjCpf ?? 'No CNPJ';
         } else {
           return 'Error to get Acquirer Data';
         }

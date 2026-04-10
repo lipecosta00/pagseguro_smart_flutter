@@ -93,12 +93,12 @@ void main() {
       final result = await payment.getSubAcquirerData();
 
       expect(result, isNotNull);
-      expect(result!['cnpjCpf'], '12345678000199');
-      expect(result['docType'], 'J');
-      expect(result['fullName'], 'Empresa Teste LTDA');
-      expect(result['merchantId'], 'MERCHANT123');
-      expect(result['city'], 'São Paulo');
-      expect(result['uf'], 'SP');
+      expect(result!.cnpjCpf, '12345678000199');
+      expect(result.docType, 'J');
+      expect(result.fullName, 'Empresa Teste LTDA');
+      expect(result.merchantId, 'MERCHANT123');
+      expect(result.city, 'São Paulo');
+      expect(result.uf, 'SP');
       expect(log.last.method, 'getSubAcquirerData');
     });
 

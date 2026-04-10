@@ -6,6 +6,7 @@ import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPag;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagAppIdentification;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagCustomPrinterLayout;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagSubAcquirerResult;
+import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagUserDataResult;
 import java.util.HashMap;
 import java.util.Map;
 import dev.gabul.pagseguro_smart_flutter.managers.UserDataManager;
@@ -61,6 +62,9 @@ public class PagSeguroSmart {
 
   //Sub Acquirer
   private static final String GET_SUB_ACQUIRER_DATA = "getSubAcquirerData";
+
+  //User Data
+  private static final String GET_USER_DATA = "getUserData";
 
   private static final String PRINTER_BASIC = "paymentPrinterBasic";
   private static final String PRINTER_FILE_PATH = "paymentPrinterFilePath";
@@ -219,36 +223,74 @@ public class PagSeguroSmart {
     }
     else if(call.method.equals(DEBIT_NFC)) {
       this.nfcPayment.debitNFCCard(call.argument("idEvento"),call.argument("valor"));
-    } else if (call.method.equals(GET_SUB_ACQUIRER_DATA)) {
-      getSubAcquirerData(result);
+    } else if (call.method.equals(GET_USER_DATA)) {
+      this.getUserData(result);
     } else {
       result.notImplemented();
     }
   }
-  private void getSubAcquirerData(MethodChannel.Result result) {
-    try {
-      PlugPagSubAcquirerResult data = plugPag.getSubAcquirerData();
-      if (data != null) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("cnpjCpf", data.getCnpjCpf());
-        map.put("docType", data.getDocType());
-        map.put("merchantId", data.getMerchantId());
-        map.put("fullName", data.getFullName());
-        map.put("name", data.getName());
-        map.put("address", data.getAddress());
-        map.put("city", data.getCity());
-        map.put("uf", data.getUf());
-        map.put("zipCode", data.getZipCode());
-        map.put("country", data.getCountry());
-        map.put("telephone", data.getTelephone());
-        map.put("mcc", data.getMcc());
-        result.success(map);
-      } else {
-        result.success(null);
+  public void getSubAcquirerData(MethodChannel.Result result) {
+    Log.d("PagSeguroSmart", "getSubAcquirerData() called");
+    // Run on background thread to prevent blocking the method channel
+    new Thread(() -> {
+      try {
+        PlugPagSubAcquirerResult data = plugPag.getSubAcquirerData();
+        Log.d("PagSeguroSmart", "getSubAcquirerData result: " + data);
+        if (data != null) {
+          Log.d("PagSeguroSmart", "SubAcquirerData - CNPJ: " + data.getCnpjCpf() + ", Name: " + data.getName());
+          Map<String, Object> map = new HashMap<>();
+          map.put("cnpjCpf", data.getCnpjCpf());
+          map.put("docType", data.getDocType());
+          map.put("merchantId", data.getMerchantId());
+          map.put("fullName", data.getFullName());
+          map.put("name", data.getName());
+          map.put("address", data.getAddress());
+          map.put("city", data.getCity());
+          map.put("uf", data.getUf());
+          map.put("zipCode", data.getZipCode());
+          map.put("country", data.getCountry());
+          map.put("telephone", data.getTelephone());
+          map.put("mcc", data.getMcc());
+          result.success(map);
+        } else {
+          Log.w("PagSeguroSmart", "getSubAcquirerData returned null - POS may not be configured with sub-acquirer data");
+          result.success(null);
+        }
+      } catch (Exception e) {
+        Log.e("PagSeguroSmart", "Error getting sub-acquirer data", e);
+        result.error("SUB_ACQUIRER_ERROR", e.getMessage(), null);
       }
-    } catch (Exception e) {
-      result.error("SUB_ACQUIRER_ERROR", e.getMessage(), null);
-    }
+    }).start();
+  }
+
+  public void getUserData(MethodChannel.Result result) {
+    Log.d("PagSeguroSmart", "getUserData() called");
+    // Run on background thread to prevent blocking the method channel
+    new Thread(() -> {
+      try {
+        PlugPagUserDataResult data = plugPag.getUserData();
+        Log.d("PagSeguroSmart", "getUserData result: " + data);
+        if (data != null) {
+          Log.d("PagSeguroSmart", "UserData retrieved successfully");
+          Map<String, Object> map = new HashMap<>();
+          map.put("address", data.getAddress());
+          map.put("city", data.getCity());
+          map.put("cnpjCpf", data.getCnpjCpf());
+          map.put("addressComplement", data.getAddressComplement());
+          map.put("companyName", data.getCompanyName());
+          map.put("userNickName", data.getUserNickName());
+          map.put("addressState", data.getAddressState());
+          map.put("email", data.getEmail());
+          result.success(map);
+        } else {
+          Log.w("PagSeguroSmart", "getUserData returned null");
+          result.success(null);
+        }
+      } catch (Exception e) {
+        Log.e("PagSeguroSmart", "Error getting user data", e);
+        result.error("USER_DATA_ERROR", e.getMessage(), null);
+      }
+    }).start();
   }
 
   public void dispose() {

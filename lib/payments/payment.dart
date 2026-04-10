@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 
 import 'package:pagseguro_smart_flutter/payments/handler/payment_handler.dart';
 import 'package:pagseguro_smart_flutter/payments/utils/payment_types.dart';
+import 'package:pagseguro_smart_flutter/payments/sub_acquirer_data.dart';
+import 'package:pagseguro_smart_flutter/payments/user_data.dart';
 
 //Fixed channel name
 const CHANNEL_NAME = "pagseguro_smart_flutter";
@@ -200,15 +202,27 @@ class Payment {
     }
   }
 
-  /// Obtém os dados do sub-adquirente (CNPJ, nome, etc.)
-  /// Retorna null se não houver perfil de sub-adquirência configurado
-  Future<Map<String, dynamic>?> getSubAcquirerData() async {
+//Function to get sub-acquirer data
+  Future<SubAcquirerData?> getSubAcquirerData() async {
     try {
       final result = await channel.invokeMethod(
         PaymentTypeCall.GET_SUB_ACQUIRER_DATA.method,
       );
       if (result == null) return null;
-      return Map<String, dynamic>.from(result);
+      return SubAcquirerData.fromMap(Map<String, dynamic>.from(result));
+    } catch (e) {
+      return null;
+    }
+  }
+
+//Function to get user data
+  Future<UserData?> getUserData() async {
+    try {
+      final result = await channel.invokeMethod(
+        PaymentTypeCall.GET_USER_DATA.method,
+      );
+      if (result == null) return null;
+      return UserData.fromMap(Map<String, dynamic>.from(result));
     } catch (e) {
       return null;
     }

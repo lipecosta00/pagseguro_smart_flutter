@@ -177,6 +177,37 @@ class PaymentController extends PaymentHandler {
 
 ```
 
+### # Métodos de Pagamento
+
+#### Pagamentos
+
+- `creditPayment(int value, {String userReference, bool printReceipt, bool partialPay, bool isCarne})`: Realiza um pagamento no crédito à vista.
+- `creditPaymentParc(int value, int parc, {PaymentTypeCredit type, String userReference, bool printReceipt, bool partialPay, bool isCarne})`: Realiza um pagamento no crédito parcelado.
+- `debitPayment(int value, {String userReference, bool printReceipt, bool partialPay, bool isCarne})`: Realiza um pagamento no débito.
+- `pixPayment(int value, {String userReference, bool printReceipt, bool partialPay, bool isCarne})`: Realiza um pagamento via PIX.
+- `voucherPayment(int value, {String userReference, bool printReceipt, bool partialPay, bool isCarne})`: Realiza um pagamento com voucher.
+- `startPayment(PaymentType type, int amount, {PaymentTypeCredit installmentType, int installments, String userReference, bool printReceipt, bool partialPay, bool isCarne})`: Inicia um pagamento genérico.
+
+#### Operações
+
+- `abortTransaction()`: Aborta a transação atual.
+- `lastTransaction()`: Obtém a última transação.
+- `refund({String? transactionCode, String? transactionId})`: Realiza um estorno.
+- `isAuthenticated()`: Verifica se o pinpad está autenticado.
+- `getSubAcquirerData()`: Obtém os dados do sub-adquirente (POS owner). Retorna um `SubAcquirerData` com campos como `cnpjCpf`, `name`, `address`, etc.
+
+#### Impressão
+
+- `printerfromFile(String path)`: Imprime a partir de um arquivo.
+- `printerFile(String fileName)`: Imprime um arquivo.
+- `printer(String filePath)`: Imprime básico.
+- `printerFilePath(String filePath)`: Imprime a partir do caminho do arquivo.
+
+#### Dispositivo
+
+- `rebootDevice()`: Reinicia o dispositivo.
+- `beep()`: Emite um beep.
+
 #### Métodos da `PaymentHandler`
 
 ##### onAbortedSuccessfully
